@@ -1,0 +1,7 @@
+dependencies:
+- name: redis
+  repository: "@stable"
+  version: 9.5.2
+  tags:
+  - openfaas-redis
+

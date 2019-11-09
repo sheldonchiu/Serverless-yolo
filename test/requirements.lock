@@ -1,0 +1,9 @@
+dependencies:
+- name: openfaas
+  repository: https://openfaas.github.io/faas-netes/
+  version: 5.2.2
+- name: redis
+  repository: https://kubernetes-charts.storage.googleapis.com
+  version: 9.5.2
+digest: sha256:da7fa0ce9610a147d016d63dc1a94f8037394c767b2051b9511e79ee62626d6e
+generated: "2019-11-09T15:17:01.307824424+08:00"
