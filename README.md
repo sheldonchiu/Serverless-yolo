@@ -53,7 +53,7 @@ link: https://github.com/openfaas/faas-netes/blob/master/chart/openfaas/README.m
 > --from-literal=basic-auth-user=admin \ <br>
 > --from-literal=basic-auth-password="$PASSWORD" <p>
 
-> <p> helm repo update \
+> <p> helm repo update \ <br>
 > && helm upgrade openfaas --install openfaas/openfaas \ <br>
 >    --namespace openfaas  \ <br>
 >    --set basic_auth=true \ <br>
