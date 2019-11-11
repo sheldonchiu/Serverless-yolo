@@ -3,7 +3,11 @@
 # Declare variables to be passed into your templates.
   
 openfaas-redis:
-  name: openfaas-redis
+  # name: openfaas-redis
   namespace: openfaas-fn
   usePassword: false 
   master.persistence.enabled: false
+
+openfaas-mongodb:
+  replicaSetName: openfaas-mongodb
+  namespace: openfaas-fn

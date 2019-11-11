@@ -13,7 +13,8 @@ sudo apt-get update && sudo apt-get install -y kubectl
 ***Setup***
 
 > wget: wget -q -O - https://raw.githubusercontent.com/rancher/k3d/master/install.sh | bash \
-sudo export KUBECONFIG="$(k3d get-kubeconfig --name='k3s-default')" >> ~/.bashrc
+sudo export KUBECONFIG="$(k3d get-kubeconfig --name='k3s-default')" >> ~/.bashrc \
+. ~/.bashrc
 
 create cluster
 
@@ -28,9 +29,9 @@ delete cluster
 
 > curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
 
-> <p>kubectl -n kube-system create sa tiller \
->  && kubectl create clusterrolebinding tiller \
->  --clusterrole cluster-admin \
+> <p>kubectl -n kube-system create sa tiller \ <br>
+>  && kubectl create clusterrolebinding tiller \ <br>
+>  --clusterrole cluster-admin \ <br>
 >  --serviceaccount=kube-system:tiller <p>
 
 > helm init --skip-refresh --upgrade --service-account tiller
@@ -65,6 +66,13 @@ For local development, expose the port with this
 
 > kubectl port-forward svc/gateway -n openfaas 8080:8080
 
+or
+
+> export OPENFAAS_URL="\<node ip\>:31112"
+
+***To obtain the ip***
+> kubectl get pods -n openfaas -o yaml | grep hostIP
+
 ***PASSWORD***
 
 This command logs in and saves a file to ~/.openfaas/config.yml
@@ -87,6 +95,13 @@ link: https://github.com/openfaas/workshop/blob/master/lab3.md
 
 # Start helm chart
 
-> helm install . --namespace openfaas-fn
+> helm install --name dev --namespace openfaas-fn test
 
-helm install stable/redis --name openfaas-redis --namespace openfaas-fn --set usePassword=false --set master.persistence.enabled=false
+# Access the pod
+Same as OPENFAAS_URL
+
+e.g 172.19.0.2
+
+# Install helm dependencies
+To install all dependencies listed in requirements.yaml
+ > helm dep up . 

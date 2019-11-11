@@ -4,4 +4,11 @@ dependencies:
   version: 9.5.2
   tags:
   - openfaas-redis
+- name: mongodb
+  repository: "@stable"
+  version: 7.4.4
+  tags:
+  - openfaas-mongodb
+
+  
 
