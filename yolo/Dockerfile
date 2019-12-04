@@ -1,6 +1,8 @@
 FROM openfaas/classic-watchdog:0.18.0 as watchdog
 
-FROM sheldonchiu/yolo:latest
+FROM sheldonchiu/yolo-cpu:latest
+
+USER root
 
 COPY --from=watchdog /fwatchdog /usr/bin/fwatchdog
 RUN chmod +x /usr/bin/fwatchdog
@@ -14,11 +16,16 @@ RUN chmod +x /usr/bin/fwatchdog
 # USER app
 
 # Populate example here - i.e. "cat", "sha512sum" or "node index.js"
-ENV fprocess="bash"
+ENV fprocess="python index.py"
 # Set to true to see request in function logs
 ENV write_debug="true"
 
 EXPOSE 8080
+
+RUN pip install pymongo
+
+WORKDIR /comp4651
+COPY . .
 
 HEALTHCHECK --interval=3s CMD [ -e /tmp/.lock ] || exit 1
 

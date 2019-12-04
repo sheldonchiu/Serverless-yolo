@@ -1,3 +1,6 @@
+# Development setup - vagrant is
+Link: https://github.com/rootsongjc/kubernetes-vagrant-centos-cluster
+
 # Openfaas setup
 https://github.com/openfaas/workshop/blob/master/lab1b.md
 
@@ -58,7 +61,9 @@ link: https://github.com/openfaas/faas-netes/blob/master/chart/openfaas/README.m
 > && helm upgrade openfaas --install openfaas/openfaas \ <br>
 >    --namespace openfaas  \ <br>
 >    --set basic_auth=true \ <br>
->    --set functionNamespace=openfaas-fn <p>
+>    --set functionNamespace=openfaas-fn \ <br>
+>    --set queueWorker.replicas=3 \ <br>
+>    --set queueWorker.ackwait="120s"<p>
 
 * refer to link for configuration detail
 
@@ -93,10 +98,6 @@ link: https://github.com/openfaas/workshop/blob/master/lab3.md
 
 * rename yml to stack.yml and use without -f
 
-# Start helm chart
-
-> helm install --name dev --namespace openfaas-fn test
-
 # Access the pod
 Same as OPENFAAS_URL
 
@@ -105,3 +106,23 @@ e.g 172.19.0.2
 # Install helm dependencies
 To install all dependencies listed in requirements.yaml
  > helm dep up . 
+
+ http://grafana.sheldon.io/
+
+ https://172.17.8.101:8443/
+
+ # redis and monggo
+
+ ## PV
+ > kubectl apply -f sc.yaml 
+
+ # Start helm chart
+> helm install --name dev --namespace openfaas-fn test
+
+faas-cli remove #name
+
+helm del --purge #name
+
+# portworx
+
+helm install --debug --name test --set etcdEndPoint=etcd:http://172.17.8.101:2379,clusterName=mycluster ./helm/charts/portworx/

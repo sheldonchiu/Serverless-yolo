@@ -1,14 +1,28 @@
-curl -SLsf https://cli.openfaas.com | sudo sh
+#helm
+kubectl -n kube-system create sa tiller \
+&& kubectl create clusterrolebinding tiller \
+--clusterrole cluster-admin \
+--serviceaccount=kube-system:tiller 
 
-sudo echo export OPENFAAS_PREFIX="" >> ~/.bashrc # Populate with your Docker Hub username
+helm init --skip-refresh --upgrade --service-account tiller
 
-sudo apt-get update && sudo apt-get install -y apt-transport-https
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
-sudo apt-get update
-sudo apt-get install -y kubectl
+#Create namespace
+kubectl apply -f https://raw.githubusercontent.com/openfaas/faas-netes/master/namespaces.yml
+helm repo add openfaas https://openfaas.github.io/faas-netes/
 
-wget: wget -q -O - https://raw.githubusercontent.com/rancher/k3d/master/install.sh | bash
+#password
+PASSWORD=$(head -c 12 /dev/urandom | shasum| cut -d' ' -f1)
+kubectl -n openfaas create secret generic basic-auth \
+--from-literal=basic-auth-user=admin \
+--from-literal=basic-auth-password="$PASSWORD" 
 
-sudo export KUBECONFIG="$(k3d get-kubeconfig --name='k3s-default')" >> ~/.bashrc
-. ~/.bashrc
+helm repo update \
+&& helm upgrade openfaas --install openfaas/openfaas \
+--namespace openfaas \
+--set basic_auth=true \
+--set functionNamespace=openfaas-fn 
+
+#install infra
+cd /media/sheldon/Data/Github/Comp4651-Project
+kubectl apply -f sc.yaml
+helm install --name dev --namespace openfaas-fn test
