@@ -46,4 +46,4 @@ done
 sleep 2
 
 echo -n $PASSWORD | faas-cli login --username admin --password-stdin
-# faas-cli up -f yolo.yml
+faas-cli up -f yolo.yml
