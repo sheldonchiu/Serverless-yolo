@@ -37,7 +37,7 @@ image:
 
 ## String to partially override mongodb.fullname template (will maintain the release name)
 ##
-# nameOverride:
+nameOverride: mongodb
 
 ## String to fully override mongodb.fullname template
 ##

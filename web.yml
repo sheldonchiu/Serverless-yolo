@@ -45,7 +45,7 @@ metadata:
     namespace: openfaas-fn
 spec:
     rules:
-    - host: test.sheldon.io
+    - host: test.comp4651.io
       http:
         paths:
           - path: /

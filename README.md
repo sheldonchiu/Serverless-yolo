@@ -15,6 +15,7 @@ Make sure the cluster is ready by running
 
 Check if all three nodes are ready
 
+Kubernetes dashboard URL: https://172.17.8.101:8443
 
 ## Alternative- K3d (not tested)
 ***Setup***
@@ -120,6 +121,17 @@ echo -n $PASSWORD | faas-cli login --username admin --password-stdin
 
 At this point, no function is being deployed, therefore it should return an empty list
 
+ # Redis and mongoDB
+
+***Create 3 persistent volumes***
+ > kubectl apply -f sc.yaml 
+
+ ***Start helm chart***
+> helm install --name dev --namespace openfaas-fn db
+
+***To remove the installed chart***
+> helm del --purge \<name\>
+
 # Deploy function to Openfaas
 link: https://github.com/openfaas/workshop/blob/master/lab3.md
 
@@ -130,22 +142,32 @@ link: https://github.com/openfaas/workshop/blob/master/lab3.md
 * up combines build, push and deploy
 * rename yml to stack.yml and use without -f
 
-# Install helm dependencies
-To install all dependencies listed in requirements.yaml
- > helm dep up . 
+***To remove function***
+> faas-cli remove \<function-name\>
 
- # Redis and monggo
+# Visit the website
 
- ## Create 3 persistent volumes
- > kubectl apply -f sc.yaml 
+Append the following line to /etc/hosts
+> 172.17.8.102  test.comp4651.io
 
- # Start helm chart
-> helm install --name dev --namespace openfaas-fn db
+The hostname is configured in web.yml, using traefik ingress
 
-faas-cli remove #name
+Visit test.comp4651.io
 
-helm del --purge #name
+<!-- # portworx
 
-# portworx
+helm install --debug --name test --set etcdEndPoint=etcd:http://172.17.8.101:2379,clusterName=mycluster ./helm/charts/portworx/ -->
 
-helm install --debug --name test --set etcdEndPoint=etcd:http://172.17.8.101:2379,clusterName=mycluster ./helm/charts/portworx/
+# Debug
+
+***Connect to Redis***
+> kubectl exec -n openfaas-fn -it dev-redis-master-0 -- /bin/bash
+> Run redis-cli inside the pod
+
+***Connect to MongoDB***
+> kubectl exec -n openfaas-fn -it \<name-of-mongo\> -- /bin/bash
+
+find the pod name using 
+> kubectl get pods -n openfaas-fn
+
+It should starts with dev-mongo

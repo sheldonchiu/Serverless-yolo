@@ -1,5 +1,5 @@
 #helm
-if ! [ -x "$(command -v helm)" ];
+if ! [ -x "$(command -v helm)" ]; then
   curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
 fi
 kubectl -n kube-system create sa tiller \
@@ -38,4 +38,12 @@ kubectl apply -f sc.yaml
 helm install --name dev --namespace openfaas-fn db
 kubectl apply -f web.yml
 
+while [[ $(kubectl get pods -n openfaas | grep gateway) != *"Running"* ]]; 
+do
+    sleep 1
+done
+
+sleep 2
+
 echo -n $PASSWORD | faas-cli login --username admin --password-stdin
+# faas-cli up -f yolo.yml
