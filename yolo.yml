@@ -6,8 +6,9 @@ functions:
   yolo-openfaas:
     lang: dockerfile
     handler: ./yolo
-    image: sheldonchiu/yolo-openfaas:cpu2
+    image: sheldonchiu/yolo-openfaas:cpu5
     environment:
       redis: dev-redis-master
       mongo: dev-mongodb
+      write_debug: true
 

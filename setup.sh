@@ -1,4 +1,7 @@
 #helm
+if ! [ -x "$(command -v helm)" ];
+  curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+fi
 kubectl -n kube-system create sa tiller \
 && kubectl create clusterrolebinding tiller \
 --clusterrole cluster-admin \
@@ -12,17 +15,27 @@ helm repo add openfaas https://openfaas.github.io/faas-netes/
 
 #password
 PASSWORD=$(head -c 12 /dev/urandom | shasum| cut -d' ' -f1)
+
 kubectl -n openfaas create secret generic basic-auth \
 --from-literal=basic-auth-user=admin \
 --from-literal=basic-auth-password="$PASSWORD" 
+
+while [[ $(kubectl get pods -n kube-system | grep tiller) != *"1/1"* ]]; 
+do
+    sleep 1
+done
 
 helm repo update \
 && helm upgrade openfaas --install openfaas/openfaas \
 --namespace openfaas \
 --set basic_auth=true \
---set functionNamespace=openfaas-fn 
+--set functionNamespace=openfaas-fn \
+--set queueWorker.replicas=3 \
+--set queueWorker.ackWait="120s"
 
 #install infra
-cd /media/sheldon/Data/Github/Comp4651-Project
 kubectl apply -f sc.yaml
-helm install --name dev --namespace openfaas-fn test
+helm install --name dev --namespace openfaas-fn db
+kubectl apply -f web.yml
+
+echo -n $PASSWORD | faas-cli login --username admin --password-stdin

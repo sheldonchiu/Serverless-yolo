@@ -4,13 +4,11 @@
   
 openfaas-redis:
   namespace: openfaas-fn
-  usePassword: false 
+  usePassword: false
   master.persistence.enabled: false
 
 openfaas-mongodb:
   replicaSetName: openfaas-mongodb
   mongodbRootPassword: password
-  mongodbUsername: test
-  mongodbPassword: testPW
-  mongodbDatabase: comp4651
+  usePassword: false
   namespace: openfaas-fn

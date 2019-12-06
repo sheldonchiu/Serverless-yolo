@@ -1,31 +1,49 @@
-FROM openfaas/classic-watchdog:0.18.0 as watchdog
+FROM openfaas/classic-watchdog:0.18.1 as watchdog
 
-FROM sheldonchiu/yolo-cpu:latest
-
-USER root
+FROM python
 
 COPY --from=watchdog /fwatchdog /usr/bin/fwatchdog
 RUN chmod +x /usr/bin/fwatchdog
-
 # Add non root user
-# RUN useradd -ms /bin/bash app
-# RUN chown app /home/app
+RUN useradd -ms /bin/bash app
 
-# WORKDIR /home/app
+WORKDIR /home/app/
 
-# USER app
+COPY index.py           .
+COPY requirements.txt   .
 
-# Populate example here - i.e. "cat", "sha512sum" or "node index.js"
-ENV fprocess="python index.py"
-# Set to true to see request in function logs
-ENV write_debug="true"
+RUN chown -R app /home/app && \
+  mkdir -p /home/app/python && chown -R app /home/app
+USER app
+ENV PATH=$PATH:/home/app/.local/bin:/home/app/python/bin/
+ENV PYTHONPATH=$PYTHONPATH:/home/app/python
 
+RUN pip install -r requirements.txt --target=/home/app/python
+
+RUN mkdir -p function
+RUN touch ./function/__init__.py
+
+WORKDIR /home/app/
+
+USER root
+
+WORKDIR /home/app/darknet
+
+RUN wget https://raw.githubusercontent.com/pjreddie/darknet/master/data/coco.names \
+  && wget https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3.cfg \
+  && wget -q https://pjreddie.com/media/files/yolov3.weights
+
+WORKDIR /home/app/
+
+COPY function function
+
+RUN chown -R app:app ./ && \
+  chmod -R 777 /home/app/python
+
+USER app
+
+ENV fprocess="python3 index.py"
 EXPOSE 8080
-
-RUN pip install pymongo
-
-WORKDIR /comp4651
-COPY . .
 
 HEALTHCHECK --interval=3s CMD [ -e /tmp/.lock ] || exit 1
 
