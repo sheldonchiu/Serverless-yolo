@@ -15,11 +15,9 @@ spec:
             labels:
                 app: web
         spec:
-            nodeSelector:
-                kubernetes.io/hostname: "node1"
             containers:
             -   name: front-end
-                image: sheldonchiu/web:final8
+                image: sheldonchiu/comp4651-web:final
                 ports:
                 -   containerPort: 4000
 

@@ -6,9 +6,11 @@ functions:
   yolo-openfaas:
     lang: dockerfile
     handler: ./yolo
-    image: sheldonchiu/yolo-openfaas:cpu5
+    image: sheldonchiu/yolo-openfaas:final
     environment:
       redis: dev-redis-master
       mongo: dev-mongodb
       write_debug: true
+      com.openfaas.scale.min: 1
+      com.openfaas.scale.max: 20
 

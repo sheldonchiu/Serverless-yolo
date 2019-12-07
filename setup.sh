@@ -1,3 +1,6 @@
+#!/bin/bash
+
+regex='^\S+ \s* 0\/[0-9]+ \s* \S+ \s* \S+ \s* \S+$'
 #helm
 if ! [ -x "$(command -v helm)" ]; then
   curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
@@ -20,7 +23,7 @@ kubectl -n openfaas create secret generic basic-auth \
 --from-literal=basic-auth-user=admin \
 --from-literal=basic-auth-password="$PASSWORD" 
 
-while [[ $(kubectl get pods -n kube-system | grep tiller) != *"1/1"* ]]; 
+while [[ $(kubectl get pods -n kube-system | grep tiller) =~ $regex ]];
 do
     sleep 1
 done
@@ -38,7 +41,7 @@ kubectl apply -f sc.yaml
 helm install --name dev --namespace openfaas-fn db
 kubectl apply -f web.yml
 
-while [[ $(kubectl get pods -n openfaas | grep gateway) != *"Running"* ]]; 
+while [[ $(kubectl get pods -n openfaas | grep gateway) =~ $regex ]]; 
 do
     sleep 1
 done

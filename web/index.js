@@ -10,7 +10,7 @@ const sharp = require("sharp");
 const fs = require("fs");
 const path = require('path');
 var ffmpeg = require('ffmpeg');
-var OpenFaaS = require('openfaas')
+const fetch = require('node-fetch');
 
 const app = express();
 app.use("/static",express.static(path.join(__dirname, "static")));
@@ -19,7 +19,7 @@ app.use("/output",express.static(path.join(__dirname, "output")));
 const tempFolder = './temp/';
 const outputFolder = './output/';
 /*var upload = multer({ dest: 'uploads/' });*/
-const openfaas = new OpenFaaS('http://gateway.openfaas:8080')
+// const openfaas = new OpenFaaS('http://gateway.openfaas:8080')
 ////redis 
 mongoose.connect('mongodb://dev-mongodb.openfaas-fn:27017/comp4651',{ useNewUrlParser: true , useUnifiedTopology: true});
 
@@ -125,13 +125,13 @@ app.post('/', upload.any(), function(req,res){////cache used to get video from r
 
   console.log('uploaded to redis')
   //////////////////////request to openfaas 
-  openfaas
-    .invoke(
-        'async-function/yolo-openfaas', // function name
-        req.files[0].originalname, // data to send to function
-        //true, // should response be JSON? Optional, default is false
-        //false // should the response by binary? Optional, default is false
-    )
+
+var url ='http://gateway.openfaas:8080/async-function/yolo-openfaas';
+var headers = {
+  "Content-Type": "text/plain",
+}
+var data = req.files[0].originalname
+fetch(url, { method: 'POST', headers: headers, body: data});
   /////////////////////
   /////////useless as all pass to redis
   ///////////////////upload to mongodb start testing only start 
