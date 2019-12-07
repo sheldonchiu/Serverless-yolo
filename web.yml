@@ -6,7 +6,7 @@ metadata:
     name: web
     namespace: openfaas-fn
 spec:
-    replicas: 1
+    replicas: 2
     selector:
         matchLabels:
             app: web
@@ -17,7 +17,7 @@ spec:
         spec:
             containers:
             -   name: front-end
-                image: sheldonchiu/comp4651-web:final
+                image: sheldonchiu/comp4651-web:latest
                 ports:
                 -   containerPort: 4000
 
@@ -28,25 +28,26 @@ metadata:
     name: web-service
     namespace: openfaas-fn
 spec:
+    type: LoadBalancer
     selector:
         app: web
     ports:
-    - protocol: TCP
+    - name: http
       port: 80
       targetPort: 4000
 
----
-apiVersion:  networking.k8s.io/v1beta1
-kind: Ingress
-metadata:
-    name: traefik-ingress-web
-    namespace: openfaas-fn
-spec:
-    rules:
-    - host: test.comp4651.io
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName:  web-service
-              servicePort: 80
+# ---
+# apiVersion:  networking.k8s.io/v1beta1
+# kind: Ingress
+# metadata:
+#     name: traefik-ingress-web
+#     namespace: openfaas-fn
+# spec:
+#     rules:
+#     - host: test.comp4651.io
+#       http:
+#         paths:
+#           - path: /
+#             backend:
+#               serviceName:  web-service
+#               servicePort: 80

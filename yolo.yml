@@ -7,10 +7,16 @@ functions:
     lang: dockerfile
     handler: ./yolo
     image: sheldonchiu/yolo-openfaas:final
+    labels:
+      com.openfaas.scale.factor: 0
+    # limits:
+    #   cpu: "2000m"
+    #   memory: "1024Mi"
+    requests:
+      cpu: "1000m"
+      memory: "512Mi"
     environment:
       redis: dev-redis-master
       mongo: dev-mongodb
       write_debug: true
-      com.openfaas.scale.min: 1
-      com.openfaas.scale.max: 20
 

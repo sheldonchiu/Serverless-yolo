@@ -197,3 +197,12 @@ find the pod name using
 kubectl get pods -n openfaas-fn
 ```
 It should starts with dev-mongo
+
+# OpenFaas auto-scaling using K8s KPAv2
+```bash
+kubectl autoscale deployment -n openfaas-fn \
+  <function-name> \
+  --cpu-percent=150 \
+  --min=1 \
+  --max=3
+  ```
