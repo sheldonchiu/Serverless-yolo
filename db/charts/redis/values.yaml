@@ -280,15 +280,14 @@ master:
   ##
   affinity:
     nodeAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 50
-          preference:
-            matchExpressions:
-            - key: cloud.google.com/gke-nodepool
-              operator: In
-              values:
-              - default-pool
-            topologyKey: kubernetes.io/hostname
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: cloud.google.com/gke-nodepool
+            operator: In
+            values:
+            - default-pool
+          topologyKey: kubernetes.io/hostname
     # podAntiAffinity:
     #   preferredDuringSchedulingIgnoredDuringExecution:
     #     - weight: 100

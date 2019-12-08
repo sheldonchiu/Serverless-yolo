@@ -9,12 +9,12 @@ functions:
     image: sheldonchiu/yolo-openfaas:final
     labels:
       com.openfaas.scale.factor: 0
-    # limits:
-    #   cpu: "2000m"
-    #   memory: "1024Mi"
+    limits:
+      cpu: "2000m"
+      memory: "900Mi"
     requests:
       cpu: "1000m"
-      memory: "512Mi"
+      memory: "600Mi"
     environment:
       redis: dev-redis-master
       mongo: dev-mongodb

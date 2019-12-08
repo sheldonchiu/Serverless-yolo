@@ -12,8 +12,8 @@ MONGO_PORT = "27017"
 
 class mongodbController:
     def __init__(self,MONGO_HOST=MONGO_HOST,MONGO_PORT=MONGO_PORT):
-        url = "mongodb://{}:{}/".format(MONGO_HOST,MONGO_PORT)
-        self.mongoclient = pymongo.MongoClient(url)
+        url = "{}:{}".format(MONGO_HOST,MONGO_PORT)
+        self.mongoclient = pymongo.MongoClient(url, username='test', password='password', authSource='comp4651')
         self.comp4651DB = self.mongoclient["comp4651"] #DB name
         self.processCol = self.comp4651DB["process"] #user process collection
 

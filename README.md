@@ -98,11 +98,8 @@ from-literal=basic-auth-password="$PASSWORD"
 ```bash
 helm repo update \
 && helm upgrade openfaas --install openfaas/openfaas \
-    --namespace openfaas  \
-    --set basic_auth=true \
-    --set functionNamespace=openfaas-fn \ 
-    --set queueWorker.replicas=3 \ 
-    --set queueWorker.ackWait="120s"
+--namespace openfaas \
+-f openfaas.yaml
 ```
 * refer to link for configuration detail
 * currently queueWorker.ackWait is set to 120 seconds to handle asynchronous long-running tasks (task can execute for 120 second before termination)
@@ -206,7 +203,3 @@ kubectl autoscale deployment -n openfaas-fn \
   --min=1 \
   --max=3
   ```
-
-helm upgrade openfaas --install openfaas/openfaas \
---namespace openfaas \
--f openfaas.yaml
