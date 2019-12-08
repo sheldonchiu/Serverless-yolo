@@ -19,7 +19,18 @@ spec:
             -   name: front-end
                 image: sheldonchiu/comp4651-web:latest
                 ports:
-                -   containerPort: 4000
+                - containerPort: 4000
+            affinity:
+                nodeAffinity:
+                    preferredDuringSchedulingIgnoredDuringExecution:
+                    - weight: 50
+                      preference:
+                        matchExpressions:
+                        - key: cloud.google.com/gke-nodepool
+                          operator: In
+                          values:
+                          - default-pool
+                        # topologyKey: kubernetes.io/hostname
 
 ---
 apiVersion: v1

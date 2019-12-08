@@ -19,4 +19,6 @@ functions:
       redis: dev-redis-master
       mongo: dev-mongodb
       write_debug: true
+    constraints:
+      - "cloud.google.com/gke-nodepool=openfaas"
 

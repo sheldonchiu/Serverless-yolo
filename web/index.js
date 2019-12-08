@@ -125,7 +125,7 @@ app.post('/', upload.any(), function(req,res){////cache used to get video from r
   User_process.updateMany(oldname,newpro,function(err,data){
     if(err) 
       console.log(err);
-    else if(data.result.nModified > 0){
+    else if(data.nModified > 0){
       console.log("update status");
       var schema_name = "user_"+req.files[0].originalname; 
       // var Images = mongoose.model('Image', image_Schema, schema_name);
