@@ -32,14 +32,14 @@ class mongodbController:
     #===================users process============================#
 
     #return objectid string
-    def insertUserProcess(self,username,status="pending"):
+    def insertUserProcess(self,username,status="submitted"):
         return str(self.processCol.insert_one(
             {"username":username,"status":status}
         ).inserted_id)
 
     #status="done"
     #return True if updated
-    def updateUserProcess(self,userid):
+    def updateUserProcess(self,userid,status="done"):
         objectid = self.getObjectId(userid)
         if self.getUserProcess(objectid)=="removed":
             print("Userid{} data is removed".format(objectid))
@@ -47,7 +47,7 @@ class mongodbController:
         else:
             self.processCol.update_one(
                 {"_id":objectid},
-                {"$set": {"status":"done"}}
+                {"$set": {"status":status}}
             )
             return True
 
@@ -55,16 +55,21 @@ class mongodbController:
     def getUserProcess(self,userid):
         objectid = self.getObjectId(userid)
         result = self.processCol.find_one({"_id":objectid})
+        if result == None:
+            return False
         return result["status"]
     #print(getUserProcess(ObjectId("5de71d051d7cf1955bd01da5")))
 
     #return user objectId or False for not found
-    def getUserID(self,username):
-        result = self.processCol.find({"username":username})
-        for x in result:
-            if x["status"]!="removed":
-                return str(x["_id"])
-        return False
+    def getUserID(self,username,status="pending"):
+        result = self.processCol.find_one({"username":username,"status":status})
+        # result = self.processCol.find({"username":username, "status" : {$not: "removed"}})
+        # for x in result:
+        #    #if x["status"]!="removed":
+        #    return str(x["_id"])
+        if result == None:
+            return False
+        return str(result["_id"])
 
     def dropUserProcessCol(self):
         self.dropCollection("process")
@@ -75,7 +80,7 @@ class mongodbController:
     def createuserdb(self,username,replace=False):
         colname = "user_"+str(username)
         if replace:
-            #remove username status
+            #remove username status=submitted,pending,done
             self.processCol.update_many(
                 {"username":username},
                 { "$set": { "status": "removed" }}

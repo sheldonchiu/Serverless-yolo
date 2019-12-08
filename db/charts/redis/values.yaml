@@ -238,6 +238,7 @@ master:
   ## Redis Master additional pod labels and annotations
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   podLabels: {}
+    # app: redis-master
   podAnnotations: {}
 
   ## Redis Master resource requests and limits
@@ -277,7 +278,25 @@ master:
   # tolerations: []
   ## Redis Master pod/node affinity/anti-affinity
   ##
-  affinity: {}
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 50
+          preference:
+            matchExpressions:
+            - key: cloud.google.com/gke-nodepool
+              operator: In
+              values:
+              - default-pool
+            topologyKey: kubernetes.io/hostname
+    # podAntiAffinity:
+    #   preferredDuringSchedulingIgnoredDuringExecution:
+    #     - weight: 100
+    #       podAffinityTerm:
+    #         labelSelector:
+    #           matchLabels:
+    #             app: redis-master
+    #         topologyKey: kubernetes.io/hostname
 
   ## Redis Master Service properties
   service:
@@ -377,7 +396,16 @@ slave:
 
   ## Redis Slave pod/node affinity/anti-affinity
   ##
-  affinity: {}
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 50
+          preference:
+            matchExpressions:
+            - key: cloud.google.com/gke-nodepool
+              operator: In
+              values:
+              - default-pool
 
   ## Configure extra options for Redis Slave liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes)

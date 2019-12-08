@@ -10,6 +10,8 @@ from utils.mongodbController import mongodbController
 from utils.redisController import redisController
 from utils import globalconstant as gvar
 
+#import os
+
 #save to redis
 '''
 videoname = "yolotest.mp4"
@@ -28,11 +30,27 @@ print("username: {}, userid: {}, collection name: {}".format(username,userid,col
 
 #req = "name.mp4"
 def handle(username):
+    #cwd = os.getcwd()
+    # print(cwd)
+    # yolo = Yolov3(
+    #     "{}/{}".format(cwd,gvar.classesfile),
+    #     "{}/{}".format(cwd,gvar.configfile),
+    #     "{}/{}".format(cwd,gvar.weightfile),
+    # )
     yolo = Yolov3(gvar.classesfile,gvar.configfile,gvar.weightfile)
     temp = redisController(gvar.REDIS_HOST,gvar.REDIS_PORT)
     db = mongodbController(gvar.MONGO_HOST,gvar.MONGO_PORT)
-    colname = db.createuserdb(username,True)
-    userid = db.insertUserProcess(username)
+    #colname = db.createuserdb(username,True)
+    userid = db.getUserID(username,"submitted") #get submitted userid
+    if userid==False:
+        print("username: {}, not submit".format(username,userid))
+        return False
+    if db.updateUserProcess(userid,"pending") == False:
+        return userid
+    #userid = db.insertUserProcess(username)
+    
+    #print("username: {}, userid: {}, collection name: {}".format(username,userid,colname))
+
     #https://stackoverflow.com/questions/33311153/python-extracting-and-saving-video-frames
     #print(cv2.__version__)
     #vidcap = cv2.VideoCapture("yolotest.mp4") #video from: https://www.youtube.com/watch?v=vF1RPI6j7b0
@@ -45,6 +63,10 @@ def handle(username):
     success = True
     print("Reading Frame...")
     while success:
+        if db.getUserProcess(userid)=="removed": #new process replaced
+            vidcap.release()
+            print("username: {}, userid: {} is removed".format(username,userid))
+            break
         #cv2.imwrite("out/frame%d.jpg" % totalframe, image)     # save frame as JPEG file
         success,image = vidcap.read()
         #print ('Read frame{}:{}'.format(frameno,success))
@@ -72,5 +94,5 @@ def handle(username):
         else:
             vidcap.release()
             print("Read Frame total: ",str(totalframe))
-            db.updateUserProcess(userid) #"done"
-    return
+            db.updateUserProcess(userid,"done") #"done"
+    return userid

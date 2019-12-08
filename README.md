@@ -206,3 +206,7 @@ kubectl autoscale deployment -n openfaas-fn \
   --min=1 \
   --max=3
   ```
+
+helm upgrade openfaas --install openfaas/openfaas \
+--namespace openfaas \
+-f openfaas.yaml

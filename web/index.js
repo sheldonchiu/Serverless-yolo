@@ -19,9 +19,8 @@ app.use("/output",express.static(path.join(__dirname, "output")));
 const tempFolder = './temp/';
 const outputFolder = './output/';
 /*var upload = multer({ dest: 'uploads/' });*/
-// const openfaas = new OpenFaaS('http://gateway.openfaas:8080')
 ////redis 
-mongoose.connect('mongodb://dev-mongodb.openfaas-fn:27017/comp4651',{ useNewUrlParser: true , useUnifiedTopology: true});
+mongoose.connect('mongodb://dev-mongodb.openfaas-fn:27017/comp4651',{ useNewUrlParser: true , useUnifiedTopology: true, user: "test", pass:"password"});
 
 ////redis 
 var redis = require('redis');
@@ -120,6 +119,27 @@ app.get('/',function(req, res){
 var imgPath = './uploads/';
 
 app.post('/', upload.any(), function(req,res){////cache used to get video from redis so i dont add it here 
+  ///status to removed 
+  var oldname = { username: req.files[0].originalname };
+  var newpro = { $set: {username: req.files[0].originalname, status:"removed"} };
+  User_process.updateMany(oldname,newpro,function(err,data){
+    if(err) 
+      console.log(err);
+    else if(data.result.nModified > 0){
+      console.log("update status");
+      var schema_name = "user_"+req.files[0].originalname; 
+      // var Images = mongoose.model('Image', image_Schema, schema_name);
+      mongoose.connection.db.dropCollection(schema_name, function(err, result) {console.log("droppedss")});
+    }
+});
+  //////////insert new
+  var user_process = new User_process({
+    username:req.files[0].originalname, //videoname 
+    status: "submitted", 
+    });
+  user_process.save(function(err) {
+    if(err) console.log(err);
+  });
   data=fs.readFileSync(req.files[0].path); //get binary data
   client.set(req.files[0].originalname, data); //upload to redis
 
@@ -132,54 +152,6 @@ var headers = {
 }
 var data = req.files[0].originalname
 fetch(url, { method: 'POST', headers: headers, body: data});
-  /////////////////////
-  /////////useless as all pass to redis
-  ///////////////////upload to mongodb start testing only start 
- // if(!req.body && !req.files){
- //     res.json({success: false});
- //   } else {    
- //     User_process.findOne({},function(err,data){
- //         var user_process = new User_process({
- //         username: req.files[0].originalname, //videoname 
- //         status: "done", 
- //         });
- //        user_process.save(function(err, Person){
- //         if(err)
- //           console.log(err);
- //       });
- //     }).sort({_id: -1}).limit(1);
- //     var name = splitstring(req.files[0].originalname);
- //     var schema_name = "user_"+name;
- //     var Images = mongoose.model(schema_name, image_Schema);
- //     module.exports = Images;
- //     var imagedata = (new Buffer.from(data)).toString('base64');
- //     Images.findOne({},function(err,data){
- //       var image = new Images({
- //         "frameno": "1", //frame number
- //         "name": req.files[0].originalname, //image name
- //         "userid": "5dd3652b51c27c38305fd417", //user object id string
- //         "base64": imagedata, //base64 encoded jpg,
- //       });
- //       image.save(function(err, Person){
- //         if(err)
- //           console.log(err);
-        
- //       });
- //     }).sort({_id: -1}).limit(1);
- //    Images.findOne({},function(err,data){
- //       var image = new Images({
- //         "frameno": "2", //frame number
- //         "name": req.files[0].originalname, //image name
- //         "userid": "5dd3652b51c27c38305fd417", //user object id string
- //         "base64": imagedata, //base64 encoded jpg,
- //       });
- //       image.save(function(err, Person){
- //         if(err)
- //           console.log(err);        
- //       });
- //     }).sort({_id: -1}).limit(1);
- //   }
-  //////////////////////
 
   ////////////////////upload to mongodb end testing only end
   res.redirect('/');
@@ -204,40 +176,34 @@ app.get('/:name', function(req, res) {
     var schema_name = "user_"+param_name;
     var Images = mongoose.model('Image', image_Schema, schema_name); 
   var targetid="";
-  User_process.find({}, function(err,data){
-  //console.log("mongodb data");
-  //console.log(data);
- 
-  if(err){
-      console.log(err);
-    }else{
-      
-      for(i in data ){
-       var user_process_name = data[i].username;
-       if(user_process_name==param_name){
-        targetid=data[i]._id;
-        console.log(targetid);
-       }
+  // User_process.find({ username: param_name}, function(err,data){
+  // //console.log("mongodb data");
+  // //console.log(data);
+  // if(err){
+  //     console.log(err);
+  //   }else{
+  //      var user_process_name = data[i].username;
+  //      if(user_process_name==param_name){
+  //       targetid=data[i]._id;
+  //       console.log(targetid);
+  //      }
    
-       }
-      //res.render('index',{data:data,name:names,state:"showall"});
-    }
-  })
+  //     //res.render('index',{data:data,name:names,state:"showall"});
+  //   }
+  // })
   Images.find({}, function(err,data){
-    console.log(data)
     if(err){
       console.log(err);
     }else{
       var binimg =[]
       var data_array =[]
       for(i in data ){
-          if(data[i].userid==targetid){
+          // if(data[i].userid==targetid){
           var str = 'data:image/jpeg;base64,'+ data[i].base64;  
           binimg.push(str);
           data_array.push(data[i])
-          }
+          // }
        }
- 
        res.render('index',{name:param_name,data:data_array,binimgfordata:binimg,state:"showone"});//pass result to index.ejs
     }
   })
