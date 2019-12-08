@@ -195,7 +195,7 @@ kubectl get pods -n openfaas-fn
 ```
 It should starts with dev-mongo
 
-# OpenFaas auto-scaling using K8s KPAv2
+# OpenFaas auto-scaling using K8s HPAv2
 ```bash
 kubectl autoscale deployment -n openfaas-fn \
   <function-name> \
@@ -203,3 +203,15 @@ kubectl autoscale deployment -n openfaas-fn \
   --min=1 \
   --max=3
   ```
+
+  # Deploy on Google Kubernetes Engine (gke branch)
+
+## Setup
+
+***node pools***
+* default-pool
+* openfaas
+
+Since yolo detection usually consumes up to 90% cpu utilization and more than 500Mb of memory, a new node pool with high performance CPU is needed to isolate it from other tasks.
+
+To minimize the cost, auto-scaling can be applied to the openfaas node pool.
