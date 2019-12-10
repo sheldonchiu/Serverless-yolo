@@ -40,7 +40,7 @@ image:
 
 ## Cluster settings
 cluster:
-  enabled: true
+  enabled: false
   slaveCount: 2
 
 ## Use redis sentinel in the redis pod. This will disable the master and slave services and
@@ -238,6 +238,7 @@ master:
   ## Redis Master additional pod labels and annotations
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   podLabels: {}
+    # app: redis-master
   podAnnotations: {}
 
   ## Redis Master resource requests and limits

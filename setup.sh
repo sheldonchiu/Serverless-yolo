@@ -37,16 +37,16 @@ helm repo update \
 --set queueWorker.ackWait="120s"
 
 #install infra
-# kubectl apply -f sc.yaml
+kubectl apply -f sc.yaml
 helm install --name dev --namespace openfaas-fn db
-# kubectl apply -f web.yml
+kubectl apply -f web.yml
 
-# while [[ $(kubectl get pods -n openfaas | grep gateway) =~ $regex ]]; 
-# do
-#     sleep 1
-# done
+while [[ $(kubectl get pods -n openfaas | grep gateway) =~ $regex ]]; 
+do
+    sleep 1
+done
 
-# sleep 2
+sleep 2
 
-# echo -n $PASSWORD | faas-cli login --username admin --password-stdin
-# faas-cli deploy -f yolo.yml
+echo -n $PASSWORD | faas-cli login --username admin --password-stdin
+faas-cli deploy -f yolo.yml

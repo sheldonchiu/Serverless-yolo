@@ -34,6 +34,10 @@ delete cluster
 ```bash
 k3d delete
 ```
+
+## Google Kubernetes Engine
+Refer to gke branch
+
 # Quick start
 
 Execute setup.sh
@@ -45,6 +49,7 @@ Execute setup.sh
 - start mongodb and redis
 - host the Website
 - get faas-cli ready to be used
+- deploy the yolo function to Openfaas
 
 **Detail description of each command is explained below**
 
@@ -106,12 +111,13 @@ helm repo update \
 ```
 * refer to link for configuration detail
 * currently queueWorker.ackWait is set to 120 seconds to handle asynchronous long-running tasks (task can execute for 120 second before termination)
+* 3 replicas of queueWorker is created to handle 3 simultaneous tasks
 
-***Install faas-cli***
+## Install faas-cli
 ```bash
 curl -sLSf https://cli.openfaas.com | sudo sh
 ```
-To connect faas-cli to the openfaas deployment
+To setup the connection from faas-cli to the openfaas deployment:
 
 * For local development (k3d):
 ```bash
@@ -123,7 +129,7 @@ export OPENFAAS_URL="<node ip>:31112"
 ```
 *node ip can be ip of any node in the cluster*
 
-***PASSWORD***
+***Login***
 
 This command logs in and saves a file to ~/.openfaas/config.yml
 ```bash
@@ -157,8 +163,17 @@ link: https://github.com/openfaas/workshop/blob/master/lab3.md
 ```bash
 faas-cli new --lang dockerfile <function-name> --prefix="your-docker-username-here"
 ```
+Follow the instructions given in the Openfaas workshop to create your function.
+
+To start the YOLO function in this repository:
 ```bash
-faas-cli up -f yolo.yml
+faas-cli deploy -f yolo.yml
+```
+This will use the docker image create by me, and the build and push process will be skipped.
+
+To start your own function, use:
+```bash
+faas-cli up -f <yml-file>
 ```
 * up combines build, push and deploy
 * rename yml to stack.yml and use without -f
@@ -176,6 +191,8 @@ The hostname is configured in web.yml, using traefik ingress
 
 Visit test.comp4651.io
 
+***Note:*** For simplicity, traefik ingress is used for VM deployment.
+
 <!-- # portworx
 
 helm install --debug --name test --set etcdEndPoint=etcd:http://172.17.8.101:2379,clusterName=mycluster ./helm/charts/portworx/ -->
@@ -190,7 +207,7 @@ Run redis-cli inside the pod
 
 ***Connect to MongoDB***
 ```bash
-kubectl exec -n openfaas-fn -it <name-of-mongo> -- /bin/bash
+kubectl exec -n openfaas-fn -it <name-of-mongo-pod> -- /bin/bash
 ```
 find the pod name using
 ```bash
@@ -198,7 +215,7 @@ kubectl get pods -n openfaas-fn
 ```
 It should starts with dev-mongo
 
-# OpenFaas auto-scaling using K8s KPAv2
+# OpenFaas auto-scaling using K8s HPAv2
 ```bash
 kubectl autoscale deployment -n openfaas-fn \
   <function-name> \
