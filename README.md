@@ -41,10 +41,10 @@ Execute setup.sh
 - install helm on the k8s cluster
 - create two namespaces: openfaas and openfaas-fn
 - install and setup openfaas
-- create 3 persistent volumes
 - start mongodb and redis
 - host the Website
 - get faas-cli ready to be used
+- deploy the yolo function to Openfaas
 
 **Detail description of each command is explained below**
 
@@ -134,11 +134,8 @@ faas-cli list
 At this point, no function is being deployed, therefore it should return an empty list
 
  # Redis and mongoDB
+***Note:*** Google Kubernetes Engine provides dynamically provisiong Persistent Volumes, therefore, we don't have to manually create any persistent volumes.
 
-***Create 3 persistent volumes***
-```bash
-kubectl apply -f sc.yaml 
-```
  ***Start helm chart***
  ```bash
 helm install --name dev --namespace openfaas-fn db
@@ -166,12 +163,7 @@ faas-cli up -f yolo.yml
 ```
 # Visit the website
 
-Append the following line to /etc/hosts
-> 172.17.8.102  test.comp4651.io
-
-The hostname is configured in web.yml, using traefik ingress
-
-Visit test.comp4651.io
+Load balancer is used in this deployment, therefore, check the ip address given to the service using Google Cloud console or kubectl.
 
 <!-- # portworx
 
